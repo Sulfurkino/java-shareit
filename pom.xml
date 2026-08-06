@@ -74,7 +74,7 @@
 	<build>
 		<resources>
 			<resource>
-				<directory>../../../../Downloads/java-shareit [hPoY4V]/java-shareit/src/main/resources</directory>
+				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
 			</resource>
 		</resources>
@@ -89,6 +89,18 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<rules>
+						<requireJavaVersion>
+							<version>[11,12)</version>
+						</requireJavaVersion>
+					</rules>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -106,8 +118,9 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-checkstyle-plugin</artifactId>
+					<version>${maven-checkstyle-plugin.version}</version>
 					<configuration>
-						<configLocation>../../../../Downloads/java-shareit [hPoY4V]/java-shareit/checkstyle.xml</configLocation>
+						<configLocation>checkstyle.xml</configLocation>
 						<failOnViolation>true</failOnViolation>
 						<logViolationsToConsole>true</logViolationsToConsole>
 						<includeTestSourceDirectory>true</includeTestSourceDirectory>
@@ -131,6 +144,7 @@
 				<plugin>
 					<groupId>com.github.spotbugs</groupId>
 					<artifactId>spotbugs-maven-plugin</artifactId>
+					<version>${spotbugs-maven-plugin.version}</version>
 					<configuration>
 						<effort>Max</effort>
 						<threshold>High</threshold>
