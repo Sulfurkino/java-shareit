@@ -80,7 +80,7 @@
 	<build>
 		<resources>
 			<resource>
-				<directory>src/main/resources</directory>
+				<directory>../../../../Downloads/java-shareit [M7M8vX]/java-shareit/src/main/resources</directory>
 				<filtering>true</filtering>
 			</resource>
 		</resources>
@@ -126,7 +126,7 @@
 					<artifactId>maven-checkstyle-plugin</artifactId>
 					<version>${maven-checkstyle-plugin.version}</version>
 					<configuration>
-						<configLocation>checkstyle.xml</configLocation>
+						<configLocation>../../../../Downloads/java-shareit [M7M8vX]/java-shareit/checkstyle.xml</configLocation>
 						<failOnViolation>true</failOnViolation>
 						<logViolationsToConsole>true</logViolationsToConsole>
 						<includeTestSourceDirectory>true</includeTestSourceDirectory>
