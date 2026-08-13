@@ -168,6 +168,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private List<BookingDto> toDtos(List<Booking> bookings) {
-        return bookings.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
+        return bookings.stream()
+                .map(BookingMapper::toBookingDto)
+                .collect(Collectors.toList());
     }
 }

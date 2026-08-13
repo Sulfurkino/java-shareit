@@ -12,7 +12,7 @@ import ru.practicum.shareit.item.ItemController;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.UserController;
-import ru.practicum.shareit.user.dto.UserDTO;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 
@@ -35,7 +35,7 @@ class ItemControllerTests {
 
     @Test
     void shouldCreateUpdateAndSearchOnlyAvailableItems() {
-        UserDTO owner = userController.create(user("Owner", "owner@example.com"));
+        UserDto owner = userController.create(user("Owner", "owner@example.com"));
         ItemDto available = itemController.create(owner.getId(), item("Saw", "Electric tool", true));
         itemController.create(owner.getId(), item("Hidden drill", "Unavailable", false));
 
@@ -51,8 +51,8 @@ class ItemControllerTests {
 
     @Test
     void shouldExposeBookingsOnlyToOwnerAndAllowCommentAfterCompletedBooking() {
-        UserDTO owner = userController.create(user("Owner", "owner@example.com"));
-        UserDTO booker = userController.create(user("Booker", "booker@example.com"));
+        UserDto owner = userController.create(user("Owner", "owner@example.com"));
+        UserDto booker = userController.create(user("Booker", "booker@example.com"));
         ItemDto item = itemController.create(owner.getId(), item("Saw", "Electric tool", true));
         LocalDateTime start = LocalDateTime.now().minusDays(2);
         BookingDto booking = bookingController.create(BookingShortDto.builder()
@@ -75,16 +75,16 @@ class ItemControllerTests {
 
     @Test
     void shouldRejectCommentWithoutCompletedBooking() {
-        UserDTO owner = userController.create(user("Owner", "owner@example.com"));
-        UserDTO user = userController.create(user("User", "user@example.com"));
+        UserDto owner = userController.create(user("Owner", "owner@example.com"));
+        UserDto user = userController.create(user("User", "user@example.com"));
         ItemDto item = itemController.create(owner.getId(), item("Saw", "Electric tool", true));
 
         assertThrows(BadRequestException.class, () -> itemController.createComment(
                 item.getId(), user.getId(), CommentDto.builder().text("Too early").build()));
     }
 
-    private UserDTO user(String name, String email) {
-        return UserDTO.builder().name(name).email(email).build();
+    private UserDto user(String name, String email) {
+        return UserDto.builder().name(name).email(email).build();
     }
 
     private ItemDto item(String name, String description, boolean available) {

@@ -14,7 +14,7 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.ItemController;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.UserController;
-import ru.practicum.shareit.user.dto.UserDTO;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 
@@ -43,8 +43,8 @@ class BookingControllerTests {
 
     @Test
     void shouldCreateApproveAndListBooking() {
-        UserDTO owner = userController.create(user("Owner", "owner@example.com"));
-        UserDTO booker = userController.create(user("Booker", "booker@example.com"));
+        UserDto owner = userController.create(user("Owner", "owner@example.com"));
+        UserDto booker = userController.create(user("Booker", "booker@example.com"));
         ItemDto item = itemController.create(owner.getId(), item(true));
         LocalDateTime start = LocalDateTime.now().plusDays(1);
 
@@ -62,8 +62,8 @@ class BookingControllerTests {
 
     @Test
     void shouldEnforceBookingRules() {
-        UserDTO owner = userController.create(user("Owner", "owner@example.com"));
-        UserDTO anotherUser = userController.create(user("Booker", "booker@example.com"));
+        UserDto owner = userController.create(user("Owner", "owner@example.com"));
+        UserDto anotherUser = userController.create(user("Booker", "booker@example.com"));
         LocalDateTime start = LocalDateTime.now().plusDays(1);
         ItemDto availableItem = itemController.create(owner.getId(), item(true));
         ItemDto unavailableItem = itemController.create(owner.getId(), item(false));
@@ -80,9 +80,9 @@ class BookingControllerTests {
 
     @Test
     void shouldReturnForbiddenWhenBookingApprovedByWrongUser() throws Exception {
-        UserDTO owner = userController.create(user("Owner", "owner@example.com"));
-        UserDTO booker = userController.create(user("Booker", "booker@example.com"));
-        UserDTO wrongUser = userController.create(user("Wrong", "wrong@example.com"));
+        UserDto owner = userController.create(user("Owner", "owner@example.com"));
+        UserDto booker = userController.create(user("Booker", "booker@example.com"));
+        UserDto wrongUser = userController.create(user("Wrong", "wrong@example.com"));
         ItemDto item = itemController.create(owner.getId(), item(true));
         LocalDateTime start = LocalDateTime.now().plusDays(1);
         BookingDto booking = bookingController.create(booking(item.getId(), start, start.plusDays(1)),
@@ -94,8 +94,8 @@ class BookingControllerTests {
                 .andExpect(status().isForbidden());
     }
 
-    private UserDTO user(String name, String email) {
-        return UserDTO.builder().name(name).email(email).build();
+    private UserDto user(String name, String email) {
+        return UserDto.builder().name(name).email(email).build();
     }
 
     private ItemDto item(boolean available) {

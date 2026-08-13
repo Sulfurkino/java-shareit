@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.DuplicateEmailException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.user.dto.UserDTO;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<UserDTO> getAll() {
+    public List<UserDto> getAll() {
         return userRepository.findAll().stream()
                 .map(UserMapper::toDTO)
                 .collect(Collectors.toList());
@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserDTO create(UserDTO userDTO) {
+    public UserDto create(UserDto userDTO) {
         if (userRepository.existsByEmail(userDTO.getEmail())) {
             throw duplicateEmail(userDTO.getEmail());
         }
@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserDTO update(Long id, UserDTO userDTO) {
+    public UserDto update(Long id, UserDto userDTO) {
         User user = getById(id);
         if (userDTO.getEmail() != null && userRepository.existsByEmailAndIdNot(userDTO.getEmail(), id)) {
             throw duplicateEmail(userDTO.getEmail());
