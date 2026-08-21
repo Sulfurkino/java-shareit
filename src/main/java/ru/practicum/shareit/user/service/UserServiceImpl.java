@@ -1,80 +1,70 @@
 package ru.practicum.shareit.user.service;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.DuplicateEmailException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.user.dto.UserDTO;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepositoryImpl;
+import ru.practicum.shareit.user.repository.UserRepository;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
+    private final UserRepository userRepository;
 
-    private final UserRepositoryImpl userRepositoryImpl;
-
-    public UserServiceImpl(UserRepositoryImpl userRepositoryImpl) {
-        this.userRepositoryImpl = userRepositoryImpl;
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
+    @Override
+    @Transactional(readOnly = true)
     public User getById(Long id) {
-        return userRepositoryImpl.getById(id)
+        return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Не найден пользователь с id: " + id));
     }
 
-    public List<UserDTO> getAll() {
-        List<User> users = userRepositoryImpl.getAll();
-        List<UserDTO> result = new ArrayList<>();
-
-        if (users.isEmpty()) {
-            return result;
-        }
-
-        for (User userToDTO : users) {
-            result.add(UserMapper.toDTO(userToDTO));
-        }
-
-        return result;
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserDto> getAll() {
+        return userRepository.findAll().stream()
+                .map(UserMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
-    public UserDTO create(UserDTO userDTO) {
-        User user = UserMapper.toEntity(userDTO);
-        validateEmailUniqueness(user.getEmail());
-
-        User createdUser = userRepositoryImpl.save(user);
-        return UserMapper.toDTO(createdUser);
+    @Override
+    @Transactional
+    public UserDto create(UserDto userDTO) {
+        if (userRepository.existsByEmail(userDTO.getEmail())) {
+            throw duplicateEmail(userDTO.getEmail());
+        }
+        return UserMapper.toDTO(userRepository.save(UserMapper.toEntity(userDTO)));
     }
 
-    public UserDTO update(Long id, UserDTO userDTO) {
+    @Override
+    @Transactional
+    public UserDto update(Long id, UserDto userDTO) {
         User user = getById(id);
-
-        if (Objects.nonNull(userDTO.getEmail()) && !user.getEmail().equals(userDTO.getEmail())) {
-            validateEmailUniqueness(userDTO.getEmail());
+        if (userDTO.getEmail() != null && userRepository.existsByEmailAndIdNot(userDTO.getEmail(), id)) {
+            throw duplicateEmail(userDTO.getEmail());
         }
-
-        user.setName(Objects.requireNonNullElse(userDTO.getName(), user.getName()));
-        user.setEmail(Objects.requireNonNullElse(userDTO.getEmail(), user.getEmail()));
-        User updatedUser = userRepositoryImpl.save(user);
-        return UserMapper.toDTO(updatedUser);
+        Optional.ofNullable(userDTO.getName()).ifPresent(user::setName);
+        Optional.ofNullable(userDTO.getEmail()).ifPresent(user::setEmail);
+        return UserMapper.toDTO(userRepository.save(user));
     }
 
+    @Override
+    @Transactional
     public void delete(Long id) {
-        userRepositoryImpl.delete(id);
+        User user = getById(id);
+        userRepository.delete(user);
     }
 
-    private void validateEmailUniqueness(String email) {
-        List<User> users = userRepositoryImpl.getAll();
-        for (User user : users) {
-            if (email.equals(user.getEmail())) {
-                log.error("Пользователь с такой почтой " + email + " уже существует");
-                throw new DuplicateEmailException("Пользователь с такой почтой " + email + " уже существует");
-            }
-        }
+    private DuplicateEmailException duplicateEmail(String email) {
+        return new DuplicateEmailException("Пользователь с почтой " + email + " уже существует");
     }
 }
