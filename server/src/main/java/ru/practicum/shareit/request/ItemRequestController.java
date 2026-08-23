@@ -1,0 +1,54 @@
+package ru.practicum.shareit.request;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.shareit.exception.BadRequestException;
+import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.service.ItemRequestService;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(path = "/requests")
+public class ItemRequestController {
+    private static final String USER_ID_HEADER = "X-Sharer-User-Id";
+
+    private final ItemRequestService itemRequestService;
+
+    public ItemRequestController(ItemRequestService itemRequestService) {
+        this.itemRequestService = itemRequestService;
+    }
+
+    @PostMapping
+    public ItemRequestDto create(@RequestHeader(USER_ID_HEADER) Long userId,
+                                 @RequestBody ItemRequestDto itemRequestDto) {
+        return itemRequestService.create(userId, itemRequestDto);
+    }
+
+    @GetMapping
+    public List<ItemRequestDto> getAllByUser(@RequestHeader(USER_ID_HEADER) Long userId) {
+        return itemRequestService.getAllByUser(userId);
+    }
+
+    @GetMapping("/all")
+    public List<ItemRequestDto> getAll(@RequestParam(defaultValue = "0") int from,
+                                       @RequestParam(defaultValue = "10") int size,
+                                       @RequestHeader(USER_ID_HEADER) Long userId) {
+        if (from < 0 || size <= 0) {
+            throw new BadRequestException("Некорректные параметры пагинации");
+        }
+        return itemRequestService.getAll(from, size, userId);
+    }
+
+    @GetMapping("/{requestId}")
+    public ItemRequestDto getById(@PathVariable Long requestId,
+                                  @RequestHeader(USER_ID_HEADER) Long userId) {
+        return itemRequestService.getById(requestId, userId);
+    }
+}
