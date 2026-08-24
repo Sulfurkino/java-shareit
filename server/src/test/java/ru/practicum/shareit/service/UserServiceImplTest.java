@@ -54,4 +54,15 @@ class UserServiceImplTest {
         assertThrows(DuplicateEmailException.class, () ->
                 userService.update(second.getId(), UserDto.builder().email("first@ex.com").build()));
     }
+
+    @Test
+    void getAllGetByIdAndDeleteShouldWork() {
+        UserDto created = userService.create(UserDto.builder().name("George").email("g@ex.com").build());
+
+        assertEquals(1, userService.getAll().size());
+        assertEquals("George", userService.getById(created.getId()).getName());
+
+        userService.delete(created.getId());
+        assertEquals(0, userService.getAll().size());
+    }
 }

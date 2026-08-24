@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -15,6 +16,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -81,5 +83,16 @@ class ItemRequestServiceImplTest {
         assertEquals("Need a drill", found.getDescription());
         assertEquals(1, found.getItems().size());
         assertEquals(owner.getId(), found.getItems().get(0).getOwnerId());
+    }
+
+    @Test
+    void missingUserOrRequestShouldThrowNotFound() {
+        UserDto author = userService.create(UserDto.builder().name("A").email("a@ex.com").build());
+
+        assertThrows(NotFoundException.class, () -> itemRequestService.create(99L,
+                ItemRequestDto.builder().description("Need a drill").build()));
+        assertThrows(NotFoundException.class, () -> itemRequestService.getAllByUser(99L));
+        assertThrows(NotFoundException.class, () -> itemRequestService.getAll(0, 10, 99L));
+        assertThrows(NotFoundException.class, () -> itemRequestService.getById(99L, author.getId()));
     }
 }
