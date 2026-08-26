@@ -24,11 +24,13 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
                 .findFirst()
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .orElse("Validation failed");
+        log.warn(message, exception);
         return ResponseEntity.badRequest().body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), message));
     }
 
     @ExceptionHandler({BadRequestException.class, ConstraintViolationException.class})
     public ResponseEntity<ErrorResponse> handleBadRequest(Exception exception) {
+        log.warn(exception.getMessage(), exception);
         return ResponseEntity.badRequest().body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), exception.getMessage()));
     }
 

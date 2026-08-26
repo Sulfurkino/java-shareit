@@ -1,5 +1,6 @@
 package ru.practicum.shareit.request.service;
 
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -19,20 +20,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class ItemRequestServiceImpl implements ItemRequestService {
     private static final Sort CREATED_DESC = Sort.by(Sort.Direction.DESC, "created");
 
     private final ItemRequestRepository itemRequestRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
-
-    public ItemRequestServiceImpl(ItemRequestRepository itemRequestRepository,
-                                  UserRepository userRepository,
-                                  ItemRepository itemRepository) {
-        this.itemRequestRepository = itemRequestRepository;
-        this.userRepository = userRepository;
-        this.itemRepository = itemRepository;
-    }
 
     @Transactional
     @Override
